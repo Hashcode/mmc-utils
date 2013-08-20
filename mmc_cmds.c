@@ -72,6 +72,24 @@ int write_extcsd_value(int fd, __u8 index, __u8 value)
 	return ret;
 }
 
+int write_vendor_cmd(int fd, __u32 arg)
+{
+	int ret = 0;
+	struct mmc_ioc_cmd idata;
+
+	memset(&idata, 0, sizeof(idata));
+	idata.write_flag = 1;
+	idata.opcode = MMC_CMD62;
+	idata.arg = arg;
+	idata.flags = MMC_RSP_R1B | MMC_CMD_AC;
+
+	ret = ioctl(fd, MMC_IOC_CMD, &idata);
+	if (ret)
+		perror("ioctl");
+
+	return ret;
+}
+
 int send_status(int fd, __u32 *response)
 {
 	int ret = 0;
@@ -1059,3 +1077,44 @@ int do_sanitize(int nargs, char **argv)
 
 }
 
+int do_vendor_cmd(int nargs, char **argv)
+{
+	int fd, ret;
+	char *device;
+	__u8 ext_csd[512];
+	unsigned int size;
+
+	CHECK(nargs != 3, "Usage: mmc vendor 0|1|2 </path/to/mmcblkX>\n",
+			exit(1));
+
+	size = strtol(argv[1], NULL, 10);
+	device = argv[2];
+
+	fd = open(device, O_RDWR);
+	if (fd < 0) {
+		perror("open");
+		exit(1);
+	}
+
+	ret = write_vendor_cmd(fd, MMC_CMD62_ARG1);
+	if (ret) {
+		fprintf(stderr, "MMC_CMD62: Could not write ARG1 0x%08x to %s\n", MMC_CMD62_ARG1, device);
+		exit(1);
+	}
+
+	ret = write_vendor_cmd(fd, MMC_CMD62_ARG2);
+	if (ret) {
+		fprintf(stderr, "MMC_CMD62: Could not write ARG2 0x%08x to %s\n", MMC_CMD62_ARG2, device);
+		exit(1);
+	}
+
+	fprintf(stderr, "MMC_CMD62: writing bootsize=%u to %s\n", size, device);
+
+	ret = write_vendor_cmd(fd, size);
+	if (ret) {
+		fprintf(stderr, "MMC_CMD62: Could not write bootsize %u to %s\n", size, device);
+		exit(1);
+	}
+
+	return ret;
+}

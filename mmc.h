@@ -30,6 +30,10 @@
 #define R1_SWITCH_ERROR   (1 << 7)  /* sx, c */
 #define MMC_SWITCH_MODE_WRITE_BYTE	0x03	/* Set target to value */
 
+#define MMC_CMD62		62
+#define MMC_CMD62_ARG1		0xEFAC62EC
+#define MMC_CMD62_ARG2		0x00CBAEA7
+
 /*
  * EXT_CSD fields
  */

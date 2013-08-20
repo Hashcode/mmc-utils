@@ -105,6 +105,11 @@ static struct Command commands[] = {
 		"Send Sanitize command to the <device>.\nThis will delete the unmapped memory region of the device.",
 	  NULL
 	},
+	{ do_vendor_cmd, -2,
+	  "vendor", "<arg> " "<device>\n"
+		"Send CMD62 bootsize <arg> command to the <device>.\nUsed for various Samsung moviNAND cmds.",
+	  NULL
+	},
 	{ 0, 0, 0, 0 }
 };
 
