@@ -635,7 +635,8 @@ int do_enh_area_set(int nargs, char **argv)
 
 int do_read_extcsd(int nargs, char **argv)
 {
-	__u8 ext_csd[512], ext_csd_rev, reg;
+	__u8 ext_csd[512], ext_csd_rev;
+	__u32 reg;
 	int fd, ret;
 	char *device;
 	const char *str;
